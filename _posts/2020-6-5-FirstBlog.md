@@ -1,6 +1,6 @@
 ---
 layout: post
-title: GSoC'20 selection: My journey with SymPy
+title: GSoC'20 selection- My journey with SymPy
 ---
 
 Yesterday, on May 5, 2020, UST 18:00, Google announced the results for GSoC'20 program. My hard work of over three and a half months finally paid off and I was selected for the program. I am glad that I applied for SymPy since its not only one of the best organizations to work within my opinion based on how well the community functions but also because I  love mathematics and programming in Python, and SymPy brings both of them together. It is fascinating to me that I am creating a piece of software that can solve mathematical equations.
