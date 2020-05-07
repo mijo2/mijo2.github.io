@@ -1,9 +1,11 @@
 ---
 layout: post
-title: GSoC'20 selection- My journey with SymPy
+title: GSoC'20 selection - My journey with SymPy
 ---
 
-Yesterday, on May 5, 2020, UST 18:00, Google announced the results for the GSoC'20 program. My hard work of over three and a half months finally paid off and I was selected for the program. I am glad that I applied for SymPy since its not only one of the best organizations to work within my opinion based on how well the community functions but also because I  love mathematics and programming in Python, and SymPy brings both of them together. It is fascinating to me that I am creating a piece of software that can solve mathematical equations.
+Yesterday, on May 5, 2020, UST 18:00, Google announced the results for the GSoC'20 program. My hard work of over three and a half months finally paid off and I was selected for the program.
+
+I am glad that I applied for SymPy since its not only one of the best organizations to work within my opinion based on how well the community functions but also because I  love mathematics and programming in Python, and SymPy brings both of them together. It is fascinating to me that I am creating a piece of software that can solve mathematical equations.
 
 My journey with SymPy started when I was looking for organizations to work within the GSoC program since I had thought then that I would love to learn more about how open source functions regardless of my selection. I was browsing through organizations that were primarily using Python given my 2 years of experience with the programming language. When I was browsing through organizations, I would normally go for their documentation straight and set up their library code using ```git clone```, then I would read through the documentation and try to follow steps I learned in my local machine. This gave me a grasp of the library and allowed me to be more clear of whether I would want to work for this org or not. I tried this for a few organizations before I found SymPy. When I was learning for SymPy, I was amazed by the fact that the documentation was so clear that sometimes, glancing just at the example gave the essence of what the function or class is all about. Then, I decided I would love to see more about how this organization functions as a community. For some days, I would just observe how different people of the community worked together on various platforms, be it the Gitter channel or in issues/PRs. I didn't introduce myself yet as I was still looking for ways to introduce myself.
 
