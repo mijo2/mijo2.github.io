@@ -69,6 +69,6 @@ From April 1 onwards, I worked on my open PRs, especially the one which was impo
 
 # Selection
 
-I was eagerly waiting for the results and refreshing the tabs of my GSoC dashboard. At exactly UTC 18:00, the results came and I was overwhelmed with joy. Two of the key reasons why I think I was selected were my consistency as I was working almost every day for the org in some way or another, and learning new things along with incorporating it into my work. 
+I was eagerly waiting for the results and refreshing the tabs of my GSoC dashboard. At exactly UTC 18:00, the results came and I was overwhelmed with joy. The two reasons for which I am selected are probably my consistency as I was working almost every day for the org in some way or another, and learning new things along with incorporating it into my work. 
 
 
