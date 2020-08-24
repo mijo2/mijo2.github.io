@@ -11,8 +11,120 @@ would work harder when my exams end.
 
 Below is the list of tasks that I completed for the Community Bonding Period:
 
-1. Made my first blog post with jekyll.
-2. Worked on the non-constant coefficient homogeneous solver with the condition that the coefficient matrix of the system of 
+# Blog Making
+
+ Made my first blog post with jekyll. This took longer than expected since I had no experience with the same.
+ 
+# Linear, first order, Constant Coefficient, homoegeous solver
+
+The first type of solver in systems wherein any number of ODEs supplied will be solved by this solver. It does so by using matrix solutions.
+
+Lets take the system below:
+```
+d/dt(X(t)) = A * X(t)
+```
+
+Now, from here on out, we will use the notation `X(t)` or simply `X` to represent a vector of dependent variables, variables dependent on the independent variable `t`. `A` will be used to denote a constant matrix and `A(t)` will be the non-constant one. 
+
+We will write `d/dt(X(t))` as `X'` for simpler notations.
+
+So, our system is:
+```
+X' = A*X
+```
+
+For example: 
+```
+
+In [38]: eqs                                                                                                                                                                                                
+Out[38]: 
+⎡d                       d              ⎤
+⎢──(x(t)) = x(t) + y(t), ──(y(t)) = y(t)⎥
+⎣dt                      dt             ⎦
+```
+
+The system above can be respresented in the matrix form with:
+```
+X(t) = [x(t), y(t)]
+A = [ 1  1 ]
+    [ 0  1 ]
+```
+Now, with this system, lets try to find the solution.
+
+Given the system above, the general solution will be:
+```
+X = exp(A t) * C
+```
+Where `C` is the vector of constants. 
+
+Computing matrix exponential directly can be very computationally expensive. Lets use another technique to achieve that.
+
+We know that any matrix can be represented in its jordan form as(more information about jordan form [here](https://en.wikipedia.org/wiki/Jordan_normal_form)):
+```
+A = P * J * P-1
+```
+Hence, given the fact that exponential of `A` is:
+```
+exp(A) = P * exp(J) * P-1
+```
+
+We can easily get the exponential of `exp(A t)` as:
+```
+exp(A t) = P * exp(J t) * P-1
+```
+Now, computing exponential of jordan blocks is much simpler and computationally less expensive: details given [here](https://en.wikipedia.org/wiki/Matrix_exponential#General_case) and [here](https://www.math24.net/method-matrix-exponential/).
+
+Hence, we use that to get the solution for the system by getting the value for `exp(A t)`.
+
+Lets consider the example used above to show the validity of the solution:
+```
+In [41]: eqs                                                                                                                                                                                                
+Out[41]: 
+⎡d                       d              ⎤
+⎢──(x(t)) = x(t) + y(t), ──(y(t)) = y(t)⎥
+⎣dt                      dt             ⎦
+
+In [46]: (A1, A0), b = linear_ode_to_matrix(eqs, [x(t), y(t)], t, 1)                                                                                                                                        
+
+In [47]: A0                                                                                                                                                                                                 
+Out[47]: 
+⎡1  1⎤
+⎢    ⎥
+⎣0  1⎦
+
+In [48]: A1                                                                                                                                                                                                 
+Out[48]: 
+⎡1  0⎤
+⎢    ⎥
+⎣0  1⎦
+In [49]: P, J = A0.jordan_form()    
+
+In [51]: C1, C2 = symbols("C1 C2")                                                                                                                                                            
+
+In [52]: C = Matrix([C1, C2])                                                                                                                                                                               
+
+In [53]: sol_vector = P * (J*t).exp() * P.inv() * C                                                                                                                                                         
+
+In [54]: sol = [Eq(f, s) for f, s in zip([x(t), y(t)], sol_vector)]                                                                                                                                         
+
+In [55]: sol                                                                                                                                                                                                
+Out[55]: 
+⎡           t         t             t⎤
+⎣x(t) = C₁⋅ℯ  + C₂⋅t⋅ℯ , y(t) = C₂⋅ℯ ⎦
+
+In [56]: checksysodesol(eqs, sol)                                                                                                                                                                           
+Out[56]: (True, [0, 0])
+
+In [58]: dsolve(eqs)                                                                                                                                                                                        
+Out[58]: 
+⎡                    t             t⎤
+⎣x(t) = (C₁ + C₂⋅t)⋅ℯ , y(t) = C₂⋅ℯ ⎦
+
+```
+
+# Linear, n equations, Order 1, Type 3: non-constant coefficient homogeneous
+
+   Worked on the non-constant coefficient homogeneous solver with the ondition that the coefficient matrix of the system of 
    ODEs is commutative with its anti-derivative. The PR regarding this was merged in this period. Hence, two of the nine tasks
    that are to be completed for this project have been done successfully.
    
