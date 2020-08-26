@@ -124,38 +124,105 @@ Out[58]:
 
 # Linear, n equations, Order 1, Type 3: non-constant coefficient homogeneous
 
-   Worked on the non-constant coefficient homogeneous solver with the ondition that the coefficient matrix of the system of 
-   ODEs is commutative with its anti-derivative. The PR regarding this was merged in this period. Hence, two of the nine tasks
-   that are to be completed for this project have been done successfully.
-   
-   Now the library can handle lots of systems of ODEs that were not possible before, along with the fact that lots of old code 
-   and solvers were removed with this PR. The solver is named ```_linear_neq_order1_type3```. For example:
-   
-   ```
-   In [1]: from sympy import *                                                                                                                                                                                 
-   In [2]: from sympy.abc import *                                                                                                                                                                             
-   In [3]: f, g, h = symbols("f g h", cls=Function)                                                                                                                                                            
-   In [4]: eqs4 = [Eq(f(x).diff(x), x*(f(x) + g(x) + h(x))), Eq(g(x).diff(x), x*(f(x) + g(x) + h(x))), Eq(h(x).diff(x), x*(f(x) + g(x) + h(x)))]                                                               
+   Lets look at the non-constant case:
+```
+X' = A(t)*X
+```
 
-   In [6]: dsolve(eqs4)                                                                                                                                                                                        
-   Out[6]: 
-   ⎡                                           2                                               2                                               2⎤
-   ⎢                                        3⋅x                                             3⋅x                                             3⋅x ⎥
-   ⎢                                        ────                                            ────                                            ────⎥
-   ⎢       2⋅C₁   C₂   C₃   ⎛C₁   C₂   C₃⎞   2             C₁   2⋅C₂   C₃   ⎛C₁   C₂   C₃⎞   2             C₁   C₂   2⋅C₃   ⎛C₁   C₂   C₃⎞   2  ⎥
-   ⎢f(x) = ──── - ── - ── + ⎜── + ── + ──⎟⋅ℯ    , g(x) = - ── + ──── - ── + ⎜── + ── + ──⎟⋅ℯ    , h(x) = - ── - ── + ──── + ⎜── + ── + ──⎟⋅ℯ    ⎥
-   ⎣        3     3    3    ⎝3    3    3 ⎠                 3     3     3    ⎝3    3    3 ⎠                 3    3     3     ⎝3    3    3 ⎠      ⎦
+Where `A(t)` is the coefficient matrix and `X` is the vector of variables dependent on `t`.
 
-   ```
+Now lets take a case where the coefficient matrix `A` commutes with its antiderivative `B`.
+```
+A * B = B * A
+```
+
+Now, lets derivate the exponential of antiderivative with respect to `t`:
+```
+d/dt{ exp(B(t)) } = d/dt{ I + B + B^2/2 + B^3/6 + ... }
+				  = 0 + A + AB/2 + BA/2 + AB^2/6 + BAB/6 + B^2A/6 + ...
+				  = A + AB + AB^2/2 + ...
+				  = A * exp(B)
+```
+
+We reached the above result only because `A` and `B` are commutative. Now, the comparing the above result with the system:
+```
+d/dt{ exp(B(t) } = A * B(t)
+d/dt{ X(t) } = A * X(t)
+```
+
+Its easy to see that the solution for `X` is:
+```
+X(t) = B(t) C
+```
+
+Now, lets demonstrate the above with an example:
+```
+In [10]: eqs1                                                                                                                                                                                               
+Out[10]: 
+⎡d                         d                        ⎤
+⎢──(f(r)) = r⋅g(r) + f(r), ──(g(r)) = -r⋅f(r) + g(r)⎥
+⎣dr                        dr                       ⎦
+```
+For the above system, lets get the coefficient matrix `A(t)` using `linear_ode_to_matrix`
+```
+In [11]: (A1, A0), b = linear_ode_to_matrix(eqs1, [f(r), g(r)], r, 1)
+In [26]: A0                                                                                                                                                                                                 
+Out[26]: 
+⎡1   r⎤
+⎢     ⎥
+⎣-r  1⎦
+```
+
+Now, we have the coefficient matrix `A(t)` as `A0`. Lets get the value for the commutative antiderivative:
+```
+In [27]: B = integrate(A0, r)                                                                                                                                                                               
+
+In [28]: B                                                                                                                                                                                                  
+Out[28]: 
+⎡       2⎤
+⎢      r ⎥
+⎢ r    ──⎥
+⎢      2 ⎥
+⎢        ⎥
+⎢  2     ⎥
+⎢-r      ⎥
+⎢────  r ⎥
+⎣ 2      ⎦
+```
+
+We can get the solution easily by multiplying the exponential of the antiderivaitve with a vector of constants:
+```
+In [17]: C1, C2 = symbols("C1 C2")                                                                                                                                                            
+
+In [18]: C = Matrix([C1, C2])
+
+In [29]: sol_vector = exp(B) * C                                                                                                                                                                            
+
+In [30]: sol = [Eq(f, s) for f, s in zip([f(r), g(r)], sol_vector)] 
+
+In [31]: sol                                                                                                                                                                                                
+Out[31]: 
+⎡                ⎛ 2⎞            ⎛ 2⎞                    ⎛ 2⎞            ⎛ 2⎞⎤
+⎢           r    ⎜r ⎟       r    ⎜r ⎟               r    ⎜r ⎟       r    ⎜r ⎟⎥
+⎢f(r) = C₁⋅ℯ ⋅cos⎜──⎟ + C₂⋅ℯ ⋅sin⎜──⎟, g(r) = - C₁⋅ℯ ⋅sin⎜──⎟ + C₂⋅ℯ ⋅cos⎜──⎟⎥
+⎣                ⎝2 ⎠            ⎝2 ⎠                    ⎝2 ⎠            ⎝2 ⎠⎦
+
+```
+
+We can verify the solution using `checksysodesol`:
+```
+In [32]: checksysodesol(eqs1, sol)                                                                                                                                                                          
+Out[32]: (True, [0, 0])
+```
    
    As you can see, along with handling the cases of the removed solvers like: ```_linear_2eq_order1_type3```, ```_linear_2eq_order1_type4```, ```_linear_2eq_order1_type5```, ```_linear_3eq_order1_type4``` this solver lets the library
-   handle other cases, as demonstrated in the example above, i.e. when the coefficient matrix of a linear order 1 homogeneous
-   system of ODEs has all the elements as the same, as in every coefficient is equal, then regardless of the number of equations
-   in the system of ODEs, this solver will be able to handle it.
-3. Created a good first issue wherein some of the test cases from an old PR needed to be added in the master and ensured that 
+   handle other cases as well which wasn't previously possible.
+   
+# Other tasks
+1. Created a good first issue wherein some of the test cases from an old PR needed to be added in the master and ensured that 
    the new contributor gets a hands-on experience with contributing to the library.
-4. Created and almost completed the PR for adding constant coefficient homogeneous solver that can efficiently handle.
+2. Created and almost completed the PR for adding constant coefficient homogeneous solver that can efficiently handle. The details of which will be shared in the next week's blog post.
 
-These were the tasks that I was able to work on and complete before I took a break for my exams since it was the question of
+These were the tasks and implementations that I was able to work on and complete before I took a break for my exams since it was the question of
 my graduation. I planned the month accordingly because if my exams were conducted, then even in that case,
 I would have done adequate work for the Community Bonding Period. 
