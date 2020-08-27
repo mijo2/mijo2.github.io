@@ -28,7 +28,7 @@ The overall work for the project was divided into roughly four parts, depending 
 **Phase 3**:
 1. [#19838](https://github.com/sympy/sympy/pull/19838): Added different techniques to reduce systems of higher order to first order. This PR added a total of 5 ways to reduce higher order systems to first order or solvable systems. Two of these four ways work only for the second order systems. These ways aren't limited by the number of equations in the system. Along with that, two new different linear first order solvers were added for faster computation.
 
- # Issues created
+# Issues created
  I opened two good first issues for better help future contributors to start their journey with SymPy knowing how important easy issues are for starting the open source journey. Below is the list of issues that I have opened for future contributors:
  
  [#19312](https://github.com/sympy/sympy/issues/19312)
